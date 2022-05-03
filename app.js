@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import chalk from 'chalk';
+import { MongoClient } from 'mongodb';
 
 const app = express();
 const SERVIDOR_PORT = 5500;
@@ -8,9 +9,20 @@ const SERVIDOR_PORT = 5500;
 app.use(express.json());
 app.use(cors());
 
+let database = null;
+const mongoClient = new MongoClient("mongodb://localhost/27017");
+const promise = mongoClient.connect();
+promise.then(() => {
+    database = mongoClient.db("DB_MyWallet");
+    console.log(chalk.bold.yellow("Conectado ao banco!!!"));
+});
+promise.catch((e) => {
+    console.log("Problema ao conectar ao banco de dados", e);
+});
+
 
 app.post("/register", async (req, res)=>{
-    console.log("Route Create users");
+    
 });
 
 app.get("/users", async (req, res)=>{
