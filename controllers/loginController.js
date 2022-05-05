@@ -47,7 +47,7 @@ export async function registerUsers(req, res){
     }
 }
 
-export async function verifyUserIsValid(req, res){
+export async function verifyUserIsValidAndLogin(req, res){
     const loginData = loginUserSquema.validate(req.body, {
         abortEarly: false,
     });
@@ -60,6 +60,7 @@ export async function verifyUserIsValid(req, res){
 
     try {
         const userSavedInBD = await db.collection("users").findOne({email: userLogin.email});
+        const token = uuidV4();
 
         if (!userSavedInBD) {
             return res.status(422).send("Email ou senha incorretos!!!");
@@ -70,7 +71,6 @@ export async function verifyUserIsValid(req, res){
             return res.status(422).send("Email ou senha incorretos!!!");
         }
 
-        const token = uuidV4();
 
         await db.collection('session').insertOne(
             {
@@ -82,6 +82,23 @@ export async function verifyUserIsValid(req, res){
         res.status(200).send(token);
     } catch (e) {
         console.log("Impossível buscar usuário no banco", e)
+        res.sendStatus(500);
+    }
+}
+
+export async function logoutUser(req, res) {
+    const {authorization} = req.headers;
+    const token = authorization.replace('Bearer', '').trim();
+    
+    try {
+        const tokenForDelete = await db.collection('session').findOneAndDelete({token: token});
+
+        if (!tokenForDelete.value) {
+            return res.status(422).send("token não encontrado!");
+        }
+        res.sendStatus(200);
+    } catch (e) {
+        console.log("Não foi possível fazer o logout!!!",e);
         res.sendStatus(500);
     }
 }

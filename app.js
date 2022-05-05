@@ -5,7 +5,8 @@ import "dotenv/config";
 
 import { 
     registerUsers, 
-    verifyUserIsValid 
+    verifyUserIsValidAndLogin,
+    logoutUser,
 } from './controllers/loginController.js';
 
 
@@ -17,7 +18,9 @@ app.use(cors());
 
 app.post("/sign-up", registerUsers);
 
-app.post("/sign-in", verifyUserIsValid);
+app.post("/sign-in", verifyUserIsValidAndLogin);
+
+app.post("/logout", logoutUser);
 
 app.get("/", async (req, res)=>{
     console.log("Home");
@@ -25,10 +28,6 @@ app.get("/", async (req, res)=>{
 
 app.post("/new_operation", async (req, res)=>{
     console.log("Operacao");
-});
-
-app.post("/logout", async (req, res)=>{
-    console.log("Logout");
 });
 
 app.delete("/delete_operation", async (req, res)=>{
