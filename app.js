@@ -3,9 +3,10 @@ import cors from 'cors';
 import chalk from 'chalk';
 import "dotenv/config";
 
-
-import db from './db.js';
-import { registerUsers } from './controllers/loginController.js';
+import { 
+    registerUsers, 
+    verifyUserIsValid 
+} from './controllers/loginController.js';
 
 
 const app = express();
@@ -14,16 +15,9 @@ const SERVIDOR_PORT = process.env.PORT || 5500;
 app.use(express.json());
 app.use(cors());
 
-app.post("/sign_up", registerUsers);
+app.post("/sign-up", registerUsers);
 
-app.get("/users", async (req, res)=>{
-    const users = db.collection("users").find().toArray();
-    console.log(users);
-});
-
-app.post("/login", async (req, res)=>{
-    console.log("Login");
-});
+app.post("/sign-in", verifyUserIsValid);
 
 app.get("/", async (req, res)=>{
     console.log("Home");

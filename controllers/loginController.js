@@ -2,6 +2,9 @@ import bcrypt from "bcrypt";
 
 import db from '../db.js';
 import createUserSchema from "../schemas/createUserSquema.js";
+import loginUserSquema from "../schemas/loginUserSquema.js";
+import { v4 as uuidV4 } from "uuid";
+import { ObjectId } from "mongodb";
 
 export async function registerUsers(req, res){
     const body = req.body;
@@ -40,6 +43,45 @@ export async function registerUsers(req, res){
         res.sendStatus(201);
     }catch(e){
         console.log("Erro ao cadastrar", e);
+        res.sendStatus(500);
+    }
+}
+
+export async function verifyUserIsValid(req, res){
+    const loginData = loginUserSquema.validate(req.body, {
+        abortEarly: false,
+    });
+
+    if (loginData.error) {
+        return res.sendStatus(422);
+    }
+
+    const userLogin = loginData.value;
+
+    try {
+        const userSavedInBD = await db.collection("users").findOne({email: userLogin.email});
+
+        if (!userSavedInBD) {
+            return res.status(422).send("Email ou senha incorretos!!!");
+        }
+        const comparePassword = await bcrypt.compare(userLogin.password, userSavedInBD.password);
+
+        if (!comparePassword) {
+            return res.status(422).send("Email ou senha incorretos!!!");
+        }
+
+        const token = uuidV4();
+
+        await db.collection('session').insertOne(
+            {
+                token: token,
+                id: new ObjectId(userSavedInBD._id),
+            }
+        );
+
+        res.status(200).send(token);
+    } catch (e) {
+        console.log("Impossível buscar usuário no banco", e)
         res.sendStatus(500);
     }
 }
