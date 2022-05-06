@@ -71,7 +71,6 @@ export async function verifyUserIsValidAndLogin(req, res){
             return res.status(422).send("Email ou senha incorretos!!!");
         }
 
-
         await db.collection('session').insertOne(
             {
                 token: token,

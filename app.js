@@ -9,6 +9,11 @@ import {
     logoutUser,
 } from './controllers/loginController.js';
 
+import { 
+    getAllFinances,
+    saveNewOperation,
+} from './controllers/financesController.js';
+
 
 const app = express();
 const SERVIDOR_PORT = process.env.PORT || 5500;
@@ -17,18 +22,10 @@ app.use(express.json());
 app.use(cors());
 
 app.post("/sign-up", registerUsers);
-
 app.post("/sign-in", verifyUserIsValidAndLogin);
-
 app.post("/logout", logoutUser);
-
-app.get("/", async (req, res)=>{
-    console.log("Home");
-});
-
-app.post("/new_operation", async (req, res)=>{
-    console.log("Operacao");
-});
+app.get("/", getAllFinances);
+app.post("/new-operation", saveNewOperation);
 
 app.delete("/delete_operation", async (req, res)=>{
     console.log("DELETAR Operacao");
