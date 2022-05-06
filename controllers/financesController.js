@@ -1,10 +1,37 @@
 import dayjs from "dayjs";
+import { ObjectId } from "mongodb";
 
 import db from "../db.js";
 import operationSchema from "../schemas/operationSchema.js";
 
 export async function getAllFinances(req, res){
-    
+    const {authorization} = req.headers;
+    const token = authorization.replace('Bearer', '').trim();
+
+
+    try {
+        const verifyUserValid = await db.collection("session").findOne({token: token})
+        if (!verifyUserValid) {
+            return res.status(403).send("Não autorizado");
+        }
+
+        console.log(verifyUserValid.id);
+        const {id} = verifyUserValid;
+        const finances = await db.collection("finances").find(
+            {id: new ObjectId(id)}
+        ).toArray();
+        
+        const operations = finances.map((item)=>{
+            delete item.id;
+            delete item._id;
+            return item;
+        })
+        res.status(200).send(operations);
+
+    } catch (e) {
+        console.log("Não foi possível encontrar as operações!", e);
+        res.status(500).send("Não foi possível encontrar as operações!");
+    }
 }
 
 export async function saveNewOperation(req, res) {
