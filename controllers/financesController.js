@@ -20,10 +20,9 @@ export async function getAllFinances(req, res){
         const finances = await db.collection("finances").find(
             {id: new ObjectId(id)}
         ).toArray();
-        
+
         const operations = finances.map((item)=>{
             delete item.id;
-            delete item._id;
             return item;
         })
         res.status(200).send(operations);
@@ -58,5 +57,24 @@ export async function saveNewOperation(req, res) {
     } catch (e) {
         console.log("Erro ao salvar nova operacao", e);
         res.status(500).send("Erro ao salvar nova operacao");
+    }
+}
+
+export async function deleteOperation(req, res) {
+    const {_id} = req.headers;
+
+    console.log(_id)
+
+    try {
+        const teste = await db.collection("finances").deleteOne({_id: new ObjectId(_id)});
+        console.log(teste);
+        
+        if (teste.deletedCount <= 0 ) {
+            return res.sendStatus(404);
+        }
+        return res.sendStatus(202);
+    } catch (e) {
+        console.log("Não foi possível deletar", e);
+        res.status(500).send("Não foi possível deletar", e);
     }
 }

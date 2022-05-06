@@ -10,6 +10,7 @@ import {
 } from './controllers/loginController.js';
 
 import { 
+    deleteOperation,
     getAllFinances,
     saveNewOperation,
 } from './controllers/financesController.js';
@@ -25,11 +26,10 @@ app.post("/sign-up", registerUsers);
 app.post("/sign-in", verifyUserIsValidAndLogin);
 app.post("/logout", logoutUser);
 app.get("/", getAllFinances);
+app.delete("/", deleteOperation);
+
 app.post("/new-operation", saveNewOperation);
 
-app.delete("/delete_operation", async (req, res)=>{
-    console.log("DELETAR Operacao");
-});
 
 app.put("/new_operation", async (req, res)=>{
     console.log("ATUALIZAR Operacao");
