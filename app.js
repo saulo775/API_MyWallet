@@ -13,6 +13,7 @@ import {
     deleteOperation,
     getAllFinances,
     saveNewOperation,
+    updateOperation,
 } from './controllers/financesController.js';
 
 
@@ -25,18 +26,11 @@ app.use(cors());
 app.post("/sign-up", registerUsers);
 app.post("/sign-in", verifyUserIsValidAndLogin);
 app.post("/logout", logoutUser);
+
 app.get("/", getAllFinances);
 app.delete("/", deleteOperation);
-
 app.post("/new-operation", saveNewOperation);
-
-
-app.put("/new_operation", async (req, res)=>{
-    console.log("ATUALIZAR Operacao");
-});
-
-
-
+app.patch("/", updateOperation);
 
 app.listen(SERVIDOR_PORT, ()=>{
     console.log(chalk.blue.bold(`Servidor rodando na porta ${SERVIDOR_PORT}`));

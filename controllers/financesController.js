@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 
 import db from "../db.js";
 import operationSchema from "../schemas/operationSchema.js";
+import updateOperationSchema from "../schemas/updateOperationSchema.js";
 
 export async function getAllFinances(req, res){
     const {authorization} = req.headers;
@@ -63,18 +64,46 @@ export async function saveNewOperation(req, res) {
 export async function deleteOperation(req, res) {
     const {_id} = req.headers;
 
-    console.log(_id)
-
     try {
-        const teste = await db.collection("finances").deleteOne({_id: new ObjectId(_id)});
-        console.log(teste);
+        const operation = await db.collection("finances").deleteOne({_id: new ObjectId(_id)});
         
-        if (teste.deletedCount <= 0 ) {
+        if (operation.deletedCount <= 0 ) {
             return res.sendStatus(404);
         }
         return res.sendStatus(202);
     } catch (e) {
         console.log("Não foi possível deletar", e);
         res.status(500).send("Não foi possível deletar", e);
+    }
+}
+
+export async function updateOperation(req, res) {
+    const {_id} = req.headers;
+    const body = req.body;
+
+    const updateData = updateOperationSchema.validate(body);
+    if (updateData.errror) {
+        return res.status(422).send("1 ou mais dados estão incorretos");
+    }
+
+    try {
+        const operationToUpdate = await db.collection("finances").findOneAndUpdate(
+            {_id: new ObjectId(_id)},
+            {
+                $set: {
+                    amount: body.amount,
+                    description: body.description
+                }
+            }
+        );
+
+        if (!operationToUpdate) {
+            return res.sendStatus(422);
+        }
+
+        return res.sendStatus(202);
+    } catch (e) {
+        console.log("Não foi possível atualizar", e);
+        res.status(500).send("Não foi possível atualizar");
     }
 }
