@@ -3,6 +3,9 @@ import cors from 'cors';
 import chalk from 'chalk';
 import "dotenv/config";
 
+import { MongoClient } from 'mongodb';
+
+
 import { 
     registerUsers, 
     verifyUserIsValidAndLogin,
@@ -16,9 +19,8 @@ import {
     updateOperation,
 } from './controllers/financesController.js';
 
-
+const mongoClient = new MongoClient(process.env.MONGO_URI);
 const app = express();
-const SERVIDOR_PORT = process.env.PORT || 5500;
 
 app.use(express.json());
 app.use(cors());
@@ -32,7 +34,7 @@ app.delete("/", deleteOperation);
 app.post("/new-operation", saveNewOperation);
 app.patch("/", updateOperation);
 
-app.listen(SERVIDOR_PORT, ()=>{
-    console.log(chalk.blue.bold(`Servidor rodando na porta ${SERVIDOR_PORT}`));
-})
+app.listen(process.env.PORT, () => {
+    console.log("Server running on port " + process.env.PORT);
+});
 

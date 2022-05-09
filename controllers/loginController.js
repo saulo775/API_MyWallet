@@ -40,7 +40,7 @@ export async function registerUsers(req, res){
             }
         );
 
-        res.sendStatus(201);
+        res.status(201).send("User Created");
     }catch(e){
         console.log("Erro ao cadastrar", e);
         res.sendStatus(500);
@@ -53,7 +53,7 @@ export async function verifyUserIsValidAndLogin(req, res){
     });
 
     if (loginData.error) {
-        return res.sendStatus(422);
+        return res.status(422).send("Dados incorretos");
     }
 
     const userLogin = loginData.value;
@@ -78,7 +78,7 @@ export async function verifyUserIsValidAndLogin(req, res){
             }
         );
 
-        res.status(200).send(token);
+        res.status(200).send({token: token, username: userSavedInBD.username});
     } catch (e) {
         console.log("Impossível buscar usuário no banco", e)
         res.sendStatus(500);
